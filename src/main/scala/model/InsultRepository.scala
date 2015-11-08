@@ -1,18 +1,15 @@
 package model
 
 import argonaut._, Argonaut._
-import scala.io.Source
+import scala.util._
 
-case class FullInsult(id: Int, commonInsult: String, masterInsult: String, comeback: String)
+class InsultRepository(json: String) {
 
-object FullInsult {
-  implicit def FullInsultCodecJson: CodecJson[FullInsult] =
-    casecodec4(FullInsult.apply, FullInsult.unapply)("id", "common-insult", "master-insult", "comeback")
-}
-
-class InsultRepository {
-  val insults = {
-    val json = Source.fromURL(getClass.getResource("/monkey-island.json")).mkString
+  def insults: List[FullInsult] = {
     json.decodeOption[List[FullInsult]].getOrElse(Nil)
+  }
+
+  def takeRandom(howMany: Int): List[FullInsult] = {
+    Random.shuffle(insults).take(2)
   }
 }
