@@ -21,14 +21,3 @@ object FullInsult {
 case class Insult(id: Int, insult: String)
 
 case class Comeback(id: Int, comeback: String)
-
-case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback])
-
-object Player {
-  def buildFrom(fullInsults: List[FullInsult]): Player = {
-    new Player(
-      FullInsult.extractInsults(fullInsults),
-      FullInsult.extractComebacks(fullInsults)
-    )
-  }
-}
