@@ -15,7 +15,8 @@ class FightEngine(repository: InsultRepository) {
 
   def startFight(player: Player): Player = {
     val opponent = findOpponent()
-    Fight(player, opponent)
+//    Fight(player, opponent)
+    Player(Nil, Nil)
   }
 
   private def didNotUnderstand(): Char = {
