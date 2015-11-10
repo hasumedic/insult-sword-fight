@@ -10,6 +10,6 @@ class InsultRepository(json: String) {
   }
 
   def takeRandom(howMany: Int): List[FullInsult] = {
-    Random.shuffle(insults).take(2)
+    Random.shuffle(insults).take(howMany)
   }
 }

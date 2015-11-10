@@ -18,6 +18,8 @@ object FullInsult {
   }
 }
 
-case class Insult(id: Int, insult: String)
+case class Insult(id: Int, insult: String) {
+  def matches(comeback: Comeback): Boolean = id == comeback.id
+}
 
 case class Comeback(id: Int, comeback: String)

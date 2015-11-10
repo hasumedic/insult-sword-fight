@@ -31,4 +31,16 @@ class FullInsultSpec extends FunSuite with Matchers {
     assert(FullInsult.extractInsults(Nil) == Nil)
     assert(FullInsult.extractInsults(someFullInsults) == someInsults)
   }
+
+  test("insult matches comeback") {
+    assert(Insult(1, "Insult").matches(Comeback(1, "Comeback")))
+    assert(Insult(4, "Insult4").matches(Comeback(4, "Comeback4")))
+    assert(Insult(14, "Insult14").matches(Comeback(14, "Comeback14")))
+  }
+
+  test("insult not matches comeback") {
+    assert(!Insult(1, "Insult").matches(Comeback(3, "Comeback3")))
+    assert(!Insult(4, "Insult4").matches(Comeback(10, "Comeback10")))
+    assert(!Insult(2, "Insult2").matches(Comeback(14, "Comeback14")))
+  }
 }

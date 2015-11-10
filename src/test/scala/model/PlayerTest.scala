@@ -21,4 +21,25 @@ class PlayerTest extends FunSuite with Matchers {
     assert(player.knownInsults.size == 3)
     assert(player.knownComebacks.size == 3)
   }
+
+  test("learn first insults or comebacks") {
+    val player = Player.buildFrom(Nil)
+    val learnedPlayer = player.learn(Insult(1, "Insult"), Comeback(2, "Comeback2"))
+    assert(learnedPlayer.knownInsults.size == 1)
+    assert(learnedPlayer.knownComebacks.size == 1)
+  }
+
+  test("learn new insults and comebacks") {
+    val player = Player(List(Insult(1, "Insult")), List(Comeback(1, "Comeback")))
+    val learnedPlayer = player.learn(Insult(2, "Insult2"), Comeback(2, "Comeback2"))
+    assert(learnedPlayer.knownInsults.size == 2)
+    assert(learnedPlayer.knownComebacks.size == 2)
+  }
+
+  test("doesn't learn already known insults and comebacks") {
+    val player = Player(List(Insult(1, "Insult")), List(Comeback(1, "Comeback")))
+    val learnedPlayer = player.learn(Insult(1, "Insult"), Comeback(1, "Comeback"))
+    assert(learnedPlayer.knownInsults.size == 1)
+    assert(learnedPlayer.knownComebacks.size == 1)
+  }
 }
