@@ -14,17 +14,25 @@ class GameEngine {
   private var winner = false
   private var player = Player.buildFrom(repository.takeRandom(2))
 
-  private def finishGame(): Unit = over = true
+  private def gameOver(): Unit = over = true
 
   def isOver: Boolean = over
 
   def isWinner: Boolean = winner
 
+  private def playerCanFightMaster(): Boolean = {
+    (player.totalKnownInsults.toFloat / repository.insults.size) * 100 >= 75
+  }
+
   def nextFight(): Unit = {
-    if (fightEngine.playerWantsToFight()) {
+    if (playerCanFightMaster() && fightEngine.playerWantsToFightMaster()) {
+      winner = fightEngine.fightMaster(player).winner
+      if (winner) gameOver()
+    }
+    else if (fightEngine.playerWantsARegularFight()) {
       player = fightEngine.startFight(player)
-      finishGame()
-    } else finishGame()
+      nextFight()
+    } else gameOver()
   }
 
   def welcome(): Unit = {
@@ -36,6 +44,7 @@ class GameEngine {
       "Here we fight with sharp tongues! And brains!")
     println("You'll need to learn proper insults from other pirates before you are ready to face the Sword Master™. " +
       "The more insults you learn, the sooner you'll be ready to face the Sword Master™! Oh look, here comes a fellow pirate!")
+    println()
   }
 
   def goodbyePirate() = {

@@ -13,6 +13,10 @@ object FullInsult {
     fullInsults map (i => Insult(i.id, i.commonInsult))
   }
 
+  def extractMasterInsults(fullInsults: List[FullInsult]): List[Insult] = {
+    fullInsults map (i => Insult(i.id, i.masterInsult))
+  }
+
   def extractComebacks(fullInsults: List[FullInsult]): List[Comeback] = {
     fullInsults map (i => Comeback(i.id, i.comeback))
   }

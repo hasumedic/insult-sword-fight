@@ -3,6 +3,10 @@ package model
 trait Fighter
 
 case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback]) extends Fighter {
+  def totalKnownInsults: Int = {
+    knownInsults.foldLeft(0)((acc, i) => if (knownComebacks.exists(c => i.matches(c))) acc + 1 else acc)
+  }
+
   def learn(insult: Insult, comeback: Comeback): Player = {
     Player(
       if (knownInsults.contains(insult)) knownInsults else insult :: knownInsults,
@@ -11,28 +15,35 @@ case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback]) ex
   }
 
   def comeback(insult: Insult): Comeback = {
-    println(Console.YELLOW + "What's your answer?" + Console.RESET)
+    println(Console.YELLOW + "What's your reply?" + Console.RESET)
     printComebacks()
     val chosenComeback = scala.io.StdIn.readLine().toInt
-    if (!isValidComeback(chosenComeback)) comeback(insult)
+    if (!isValidComeback(chosenComeback)) {
+      println(Console.RED + "That was not a valid reply..." + Console.RESET)
+      comeback(insult)
+    }
     else lookupComeback(chosenComeback)
   }
 
   def insult(): Insult = {
+    println(Console.YELLOW + "What's your insult?" + Console.RESET)
     printInsults()
     val chosenInsult = scala.io.StdIn.readLine().toInt
-    if (!isValidInsult(chosenInsult)) insult()
+    if (!isValidInsult(chosenInsult)) {
+      println(Console.RED + "Opponent could not hear you well..." + Console.RESET)
+      insult()
+    }
     else lookupInsult(chosenInsult)
   }
 
   private def printInsults() = {
-    knownInsults.foreach { i =>
+    knownInsults.sortBy(_.id).foreach { i =>
       println(s"[${i.id}]    ${i.insult}")
     }
   }
 
   def printComebacks() = {
-    knownComebacks.foreach { i =>
+    knownComebacks.sortBy(_.id).foreach { i =>
       println(s"[${i.id}]    ${i.comeback}")
     }
   }
@@ -58,14 +69,23 @@ object Player {
 
 case class Opponent(knownInsults: List[Insult], knownComebacks: List[Comeback]) extends Fighter {
   def comeback(insult: Insult): Comeback = {
-    if (knownInsults.contains(insult)) knownComebacks.filter(_.id == insult.id).head
-    else scala.util.Random.shuffle(knownComebacks).head
+    val comeback =
+      if (knownInsults.contains(insult)) knownComebacks.filter(_.id == insult.id).head
+      else scala.util.Random.shuffle(knownComebacks).head
+
+    println(Console.YELLOW + "The pirate's comeback:" + Console.RESET)
+    println(comeback.comeback)
+    println()
+
+    comeback
   }
 
   def insult(): Insult = {
     val insult = scala.util.Random.shuffle(knownInsults).head
-    println(Console.YELLOW + "A pirate spits at you:" + Console.RESET)
+    println(Console.YELLOW + "The pirate insults you:" + Console.RESET)
     println(insult.insult)
+    println()
+
     insult
   }
 }
@@ -74,6 +94,12 @@ object Opponent {
   def buildFrom(fullInsults: List[FullInsult]): Opponent =
     Opponent(
       FullInsult.extractInsults(fullInsults),
+      FullInsult.extractComebacks(fullInsults)
+    )
+
+  def buildMaster(fullInsults: List[FullInsult]): Opponent =
+    Opponent(
+      FullInsult.extractMasterInsults(fullInsults),
       FullInsult.extractComebacks(fullInsults)
     )
 }

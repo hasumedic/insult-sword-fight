@@ -9,6 +9,8 @@ class InsultRepository(json: String) {
     json.decodeOption[List[FullInsult]].getOrElse(Nil)
   }
 
+  def takeMasterInsults: List[FullInsult] = insults
+
   def takeRandom(howMany: Int): List[FullInsult] = {
     Random.shuffle(insults).take(howMany)
   }
