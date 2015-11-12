@@ -4,17 +4,6 @@ import model.{Fighter, Opponent, Player, InsultRepository}
 
 class FightEngine(repository: InsultRepository) {
 
-  def playerWantsToFightMaster(): Boolean = {
-    println("It looks like you're ready to face the Sword Master! Would you like give it a go? [Y/N]")
-    val response = handleYesNoQuestion
-    if (response.toLower == 'y') true else false
-  }
-
-  def playerWantsARegularFight(): Boolean = {
-    val response = askPlayerForAFight()
-    if (response.toLower == 'y') true else false
-  }
-
   def startFight(player: Player): Player = {
     val opponent = findOpponent()
     Fight(player, opponent).start().player
@@ -31,25 +20,6 @@ class FightEngine(repository: InsultRepository) {
 
   private def findOpponent(): Opponent = {
     Opponent.buildFrom(repository.takeRandom(5))
-  }
-
-  private def didNotUnderstand(): Char = {
-    println("Did you drink too much Grog? Let me ask you again...")
-    askPlayerForAFight()
-  }
-
-  private def askPlayerForAFight(): Char = {
-    println("Would you like to start a fight with a pirate? [Y/N]")
-    handleYesNoQuestion
-  }
-
-  def handleYesNoQuestion: Char = {
-    val response = scala.io.StdIn.readChar()
-    response.toLower match {
-      case 'y' => response
-      case 'n' => response
-      case _ => didNotUnderstand()
-    }
   }
 }
 
