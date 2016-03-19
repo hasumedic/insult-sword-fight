@@ -1,5 +1,7 @@
 package model
 
+import game.Prompt
+
 trait Fighter
 
 case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback]) extends Fighter {
@@ -72,7 +74,7 @@ case class Opponent(knownInsults: List[Insult], knownComebacks: List[Comeback]) 
       if (knownInsults.contains(insult)) knownComebacks.filter(_.id == insult.id).head
       else scala.util.Random.shuffle(knownComebacks).head
 
-    println(Console.YELLOW + "The pirate's comeback:" + Console.RESET)
+    Prompt.pirateComeback()
     println(comeback.comeback)
     println()
 
@@ -81,7 +83,7 @@ case class Opponent(knownInsults: List[Insult], knownComebacks: List[Comeback]) 
 
   def insult(): Insult = {
     val insult = scala.util.Random.shuffle(knownInsults).head
-    println(Console.YELLOW + "The pirate insults you:" + Console.RESET)
+    Prompt.pirateInsult()
     println(insult.insult)
     println()
 

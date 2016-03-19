@@ -40,7 +40,7 @@ case class Fight(var player: Player, opponent: Opponent) {
     while (!isThereAWinner) {
       nextRound()
     }
-    reportWinner()
+    Prompt.reportFightWinner(isPlayerWinner)
     FightResult(isPlayerWinner, player)
   }
 
@@ -60,23 +60,13 @@ case class Fight(var player: Player, opponent: Opponent) {
     else upperHandWinsRound()
   }
 
-  private def reportWinner(): Unit = {
-    if (isPlayerWinner) {
-      println(Console.GREEN + "Congratulations! You won this fight!" + Console.RESET)
-      println()
-    } else {
-      println(Console.RED + "I'm afraid you lost this one... better luck next time!" + Console.RESET)
-      println()
-    }
-  }
-
   private def upperHandLosesRound(): Unit = {
     if (playerState.hasUpperHand) {
-      println(Console.RED + "You missed this one!" + Console.RESET)
+      Prompt.missedRound()
       playerState = playerState.copy(fighter = player, hasUpperHand = false)
       opponentState = opponentState.copy(score = opponentState.score + 1, hasUpperHand = true)
     } else {
-      println(Console.GREEN + "You got this one!" + Console.RESET)
+      Prompt.wonRound()
       playerState = playerState.copy(fighter = player, score = playerState.score + 1, hasUpperHand = true)
       opponentState = opponentState.copy(hasUpperHand = false)
     }
@@ -84,10 +74,10 @@ case class Fight(var player: Player, opponent: Opponent) {
 
   private def upperHandWinsRound(): Unit = {
     if (playerState.hasUpperHand) {
-      println(Console.GREEN + "You got this one!" + Console.RESET)
+      Prompt.wonRound()
       playerState = playerState.copy(fighter = player, score = playerState.score + 1)
     } else {
-      println(Console.RED + "You missed this one!" + Console.RESET)
+      Prompt.missedRound()
       opponentState = opponentState.copy(score = opponentState.score + 1)
     }
   }
@@ -104,7 +94,8 @@ case class FightMaster(var player: Player, master: Opponent) {
     while (!isThereAWinner) {
       nextRound()
     }
-    reportWinner()
+    Prompt.reportFightMasterWinner(isPlayerWinner)
+
     FightResult(isPlayerWinner, player)
   }
 
@@ -119,22 +110,12 @@ case class FightMaster(var player: Player, master: Opponent) {
     val comeback = player.comeback(insult)
 
     if (insult.matches(comeback)) {
-      println(Console.GREEN + "You got this one!" + Console.RESET)
+      Prompt.wonRound()
       playerRounds += 1
     }
     else {
-      println(Console.RED + "You missed this one!" + Console.RESET)
+      Prompt.missedRound()
       masterRounds += 1
-    }
-  }
-
-  private def reportWinner(): Unit = {
-    if (isPlayerWinner) {
-      println(Console.GREEN + "Congratulations! You've defeated the Sword Master!" + Console.RESET)
-      println()
-    } else {
-      println(Console.RED + "The Sword Master is laughing at your face! Make sure you practice a bit more before facing her again!" + Console.RESET)
-      println()
     }
   }
 }
