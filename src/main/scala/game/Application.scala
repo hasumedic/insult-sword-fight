@@ -26,11 +26,11 @@ object Application extends App {
     println()
   }
 
-  def goodbyePirate() = {
+  def goodbyePirate(): Unit = {
     println(Console.GREEN + "Oh! So you learned how to fight in the end! Well done son, use your sharp tongue wisely now!" + Console.RESET)
   }
 
-  def goodbyeLooser() = {
+  def goodbyeLooser(): Unit = {
     println(Console.RED + "Coward..." + Console.RESET)
   }
 }

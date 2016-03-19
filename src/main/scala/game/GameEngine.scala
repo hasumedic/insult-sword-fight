@@ -1,12 +1,15 @@
 package game
 
 import model._
+
 import scala.io.Source
 
 class GameEngine {
-  lazy private val repository = {
-    new InsultRepository(Source.fromURL(getClass.getResource("/monkey-island.json")).mkString)
-  }
+
+  lazy private val repository = new InsultRepository(
+    Source.fromURL(getClass.getResource("/monkey-island.json")).mkString
+  )
+
   lazy private val fightEngine = new FightEngine(repository)
 
   private var over = false
@@ -33,11 +36,7 @@ class GameEngine {
 
   private def gameOver(): Unit = over = true
 
-  /**
-   * Returns whether the player knows at least 75% of the insults
-   *
-   * @return Boolean
-   */
+  /** A player is ready to face the Master when knows at least 75% of the insults */
   private def playerIsReadyToFaceMaster(): Boolean = {
     (player.totalKnownInsults.toFloat / repository.insults.size) * 100 >= 75
   }

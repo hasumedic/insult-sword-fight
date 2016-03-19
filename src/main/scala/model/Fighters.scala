@@ -36,13 +36,13 @@ case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback]) ex
     else lookupInsult(chosenInsult)
   }
 
-  private def printInsults() = {
+  private def printInsults(): Unit = {
     knownInsults.sortBy(_.id).foreach { i =>
       println(s"[${i.id}]    ${i.insult}")
     }
   }
 
-  def printComebacks() = {
+  private def printComebacks(): Unit = {
     knownComebacks.sortBy(_.id).foreach { i =>
       println(s"[${i.id}]    ${i.comeback}")
     }
@@ -55,7 +55,6 @@ case class Player(knownInsults: List[Insult], knownComebacks: List[Comeback]) ex
   private def lookupInsult(chosenInsult: Int): Insult = (knownInsults filter (_.id == chosenInsult)).head
 
   private def lookupComeback(chosenComeback: Int): Comeback = (knownComebacks filter (_.id == chosenComeback)).head
-
 }
 
 object Player {

@@ -8,7 +8,7 @@ class FightEngine(repository: InsultRepository) {
     val opponent = findOpponent()
     Fight(player, opponent).start().player
   }
-  
+
   def fightMaster(player: Player): FightResult = {
     val master = findMaster()
     FightMaster(player, master).start()
@@ -23,6 +23,10 @@ class FightEngine(repository: InsultRepository) {
   }
 }
 
+case class FightState(fighter: Fighter, score: Int, hasUpperHand: Boolean)
+
+case class FightResult(winner: Boolean, player: Player)
+
 case class Fight(var player: Player, opponent: Opponent) {
 
   private def RoundsToWin = 3
@@ -32,11 +36,39 @@ case class Fight(var player: Player, opponent: Opponent) {
   var playerState = FightState(player, 0, firstUpperHand)
   var opponentState = FightState(opponent, 0, !firstUpperHand)
 
-  private def thereIsWinner = isPlayerWinner || opponentIsWinner
+  def start(): FightResult = {
+    while (!isThereAWinner) {
+      nextRound()
+    }
+    reportWinner()
+    FightResult(isPlayerWinner, player)
+  }
+
+  private def isThereAWinner: Boolean = isPlayerWinner || isOpponentWinner
 
   private def isPlayerWinner: Boolean = playerState.score == RoundsToWin
 
-  private def opponentIsWinner: Boolean = opponentState.score == RoundsToWin
+  private def isOpponentWinner: Boolean = opponentState.score == RoundsToWin
+
+  private def nextRound(): Unit = {
+    val insult = if (playerState.hasUpperHand) player.insult() else opponent.insult()
+    val comeback = if (playerState.hasUpperHand) opponent.comeback(insult) else player.comeback(insult)
+
+    player = player.learn(insult, comeback)
+
+    if (insult.matches(comeback)) upperHandLosesRound()
+    else upperHandWinsRound()
+  }
+
+  private def reportWinner(): Unit = {
+    if (isPlayerWinner) {
+      println(Console.GREEN + "Congratulations! You won this fight!" + Console.RESET)
+      println()
+    } else {
+      println(Console.RED + "I'm afraid you lost this one... better luck next time!" + Console.RESET)
+      println()
+    }
+  }
 
   private def upperHandLosesRound(): Unit = {
     if (playerState.hasUpperHand) {
@@ -59,34 +91,6 @@ case class Fight(var player: Player, opponent: Opponent) {
       opponentState = opponentState.copy(score = opponentState.score + 1)
     }
   }
-
-  private def nextRound(): Unit = {
-    val insult = if (playerState.hasUpperHand) player.insult() else opponent.insult()
-    val comeback = if (playerState.hasUpperHand) opponent.comeback(insult) else player.comeback(insult)
-
-    player = player.learn(insult, comeback)
-
-    if (insult.matches(comeback)) upperHandLosesRound()
-    else upperHandWinsRound()
-  }
-
-  private def reportWinner() = {
-    if (isPlayerWinner) {
-      println(Console.GREEN + "Congratulations! You won this fight!" + Console.RESET)
-      println()
-    } else {
-      println(Console.RED + "I'm afraid you lost this one... better luck next time!" + Console.RESET)
-      println()
-    }
-  }
-
-  def start(): FightResult = {
-    while (!thereIsWinner) {
-      nextRound()
-    }
-    reportWinner()
-    FightResult(isPlayerWinner, player)
-  }
 }
 
 case class FightMaster(var player: Player, master: Opponent) {
@@ -96,7 +100,15 @@ case class FightMaster(var player: Player, master: Opponent) {
   var playerRounds = 0
   var masterRounds = 0
 
-  private def isTherWinner = isPlayerWinner || isMasterWinner
+  def start(): FightResult = {
+    while (!isThereAWinner) {
+      nextRound()
+    }
+    reportWinner()
+    FightResult(isPlayerWinner, player)
+  }
+
+  private def isThereAWinner: Boolean = isPlayerWinner || isMasterWinner
 
   private def isPlayerWinner: Boolean = playerRounds == RoundsToWin
 
@@ -106,7 +118,7 @@ case class FightMaster(var player: Player, master: Opponent) {
     val insult = master.insult()
     val comeback = player.comeback(insult)
 
-    if (insult.matches(comeback)){
+    if (insult.matches(comeback)) {
       println(Console.GREEN + "You got this one!" + Console.RESET)
       playerRounds += 1
     }
@@ -116,7 +128,7 @@ case class FightMaster(var player: Player, master: Opponent) {
     }
   }
 
-  def reportWinner() = {
+  private def reportWinner(): Unit = {
     if (isPlayerWinner) {
       println(Console.GREEN + "Congratulations! You've defeated the Sword Master!" + Console.RESET)
       println()
@@ -125,16 +137,4 @@ case class FightMaster(var player: Player, master: Opponent) {
       println()
     }
   }
-
-  def start(): FightResult = {
-    while (!isTherWinner) {
-      nextRound()
-    }
-    reportWinner()
-    FightResult(isPlayerWinner, player)
-  }
 }
-
-case class FightState(fighter: Fighter, score: Int, hasUpperHand: Boolean)
-
-case class FightResult(winner: Boolean, player: Player)
